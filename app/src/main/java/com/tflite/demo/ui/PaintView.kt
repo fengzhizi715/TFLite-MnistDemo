@@ -27,9 +27,10 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
     private var bgColor = DEFAULT_BG_COLOR
     private var strokeWidth: Int = 0
 
-    var bitmap: Bitmap? = null
+    lateinit var bitmap: Bitmap
         private set
-    private var mCanvas: Canvas? = null
+
+    private lateinit var mCanvas: Canvas
     private val mBitmapPaint = Paint(Paint.DITHER_FLAG)
 
     init {
@@ -49,10 +50,10 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
         val width = metrics.widthPixels
 
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        mCanvas = Canvas(bitmap!!)
+        mCanvas = Canvas(bitmap)
 
         currentColor = DEFAULT_COLOR
-        strokeWidth = BRUSH_SIZE
+        strokeWidth = DEFAULT_SIZE
     }
 
     fun clear() {
@@ -64,17 +65,15 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
     override fun onDraw(canvas: Canvas) {
 
         canvas.save()
-        mCanvas!!.drawColor(bgColor)
+        mCanvas.drawColor(bgColor)
 
-        for ((color,strokeWidth1, path) in paths) {
+        for ((color,strokeWidth, path) in paths) {
             mPaint.color = color
-            mPaint.setStrokeWidth(strokeWidth1.toFloat())
-
-            mCanvas!!.drawPath(path, mPaint)
-
+            mPaint.strokeWidth = strokeWidth.toFloat()
+            mCanvas.drawPath(path, mPaint)
         }
 
-        canvas.drawBitmap(bitmap!!, 0f, 0f, mBitmapPaint)
+        canvas.drawBitmap(bitmap, 0f, 0f, mBitmapPaint)
         canvas.restore()
     }
 
@@ -127,7 +126,7 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
 
     companion object {
 
-        var BRUSH_SIZE = 100
+        var DEFAULT_SIZE = 100
         val DEFAULT_COLOR = Color.BLACK
         val DEFAULT_BG_COLOR = Color.WHITE
         private val TOUCH_TOLERANCE = 4f

@@ -51,7 +51,7 @@ class DigitsDetector(activity: Activity) {
     /**
      * Run the TFLite model
      */
-    fun runInference() = tflite.run(inputBuffer, mnistOutput)
+    private fun runInference() = tflite.run(inputBuffer, mnistOutput)
 
     /**
      * Classifies the number with the mnist model.
@@ -91,6 +91,7 @@ class DigitsDetector(activity: Activity) {
      */
     @Throws(IOException::class)
     private fun loadModelFile(activity: Activity): MappedByteBuffer {
+
         val fileDescriptor = activity.assets.openFd(MODEL_PATH)
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
