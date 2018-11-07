@@ -49,6 +49,20 @@ class DigitsDetector(activity: Activity) {
     }
 
     /**
+     * Load the model file from the assets folder
+     */
+    @Throws(IOException::class)
+    private fun loadModelFile(activity: Activity): MappedByteBuffer {
+
+        val fileDescriptor = activity.assets.openFd(MODEL_PATH)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
+
+    /**
      * Classifies the number with the mnist model.
      *
      * @param bitmap
@@ -60,9 +74,9 @@ class DigitsDetector(activity: Activity) {
             Log.e(TAG, "Image classifier has not been initialized; Skipped.")
         }
 
-        preprocess(bitmap)
+        preProcess(bitmap)
         runModel()
-        return postprocess()
+        return postProcess()
     }
 
     /**
@@ -70,7 +84,7 @@ class DigitsDetector(activity: Activity) {
      *
      * @param bitmap
      */
-    private fun preprocess(bitmap: Bitmap?) {
+    private fun preProcess(bitmap: Bitmap?) {
 
         if (bitmap == null || inputBuffer == null) {
             return
@@ -105,7 +119,7 @@ class DigitsDetector(activity: Activity) {
      *
      * @return the number that was identified (returns -1 if one wasn't found)
      */
-    private fun postprocess(): Int {
+    private fun postProcess(): Int {
 
         for (i in 0 until mnistOutput[0].size) {
             val value = mnistOutput[0][i]
@@ -115,20 +129,6 @@ class DigitsDetector(activity: Activity) {
         }
 
         return -1
-    }
-
-    /**
-     * Load the model file from the assets folder
-     */
-    @Throws(IOException::class)
-    private fun loadModelFile(activity: Activity): MappedByteBuffer {
-
-        val fileDescriptor = activity.assets.openFd(MODEL_PATH)
-        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
-        val fileChannel = inputStream.channel
-        val startOffset = fileDescriptor.startOffset
-        val declaredLength = fileDescriptor.declaredLength
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
     companion object {
