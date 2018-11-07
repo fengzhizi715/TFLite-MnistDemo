@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.DisplayMetrics
+import android.widget.Toast
 import com.tflite.demo.DigitsDetector
 import com.tflite.demo.R
 import kotlinx.android.synthetic.main.activity_main.*
@@ -35,20 +36,19 @@ class MainActivity : AppCompatActivity() {
 
         button_detect.setOnClickListener{
 
-            val scaledBitmap = Bitmap.createScaledBitmap(paintView.bitmap, PIXEL_WIDTH, PIXEL_WIDTH, false)
-            val digit = mnistClassifier.classify(scaledBitmap)
+            val digit = mnistClassifier.classify(Bitmap.createScaledBitmap(paintView.bitmap, PIXEL_WIDTH, PIXEL_WIDTH, false))
 
             if (digit >= 0) {
 
-                text_result.setText(digit.toString())
+                Toast.makeText(this, "$digit",Toast.LENGTH_SHORT).show()
             } else {
-                text_result.setText("Not detected")
+
+                Toast.makeText(this,"Not detected",Toast.LENGTH_SHORT).show()
             }
         }
 
         button_clear.setOnClickListener{
 
-            text_result.setText("")
             paintView.clear()
         }
     }

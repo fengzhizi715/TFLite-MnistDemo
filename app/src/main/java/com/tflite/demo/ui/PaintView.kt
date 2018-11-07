@@ -90,6 +90,7 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
     }
 
     private fun touchMove(x: Float, y: Float) {
+
         val dx = Math.abs(x - mX)
         val dy = Math.abs(y - mY)
 

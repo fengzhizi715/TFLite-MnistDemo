@@ -106,6 +106,7 @@ class DigitsDetector(activity: Activity) {
      * @param bitmap
      */
     private fun preprocess(bitmap: Bitmap?) {
+
         if (bitmap == null || inputBuffer == null) {
             return
         }
@@ -115,8 +116,6 @@ class DigitsDetector(activity: Activity) {
 
         val width = bitmap.width
         val height = bitmap.height
-
-        val startTime = System.currentTimeMillis()
 
         // The bitmap shape should be 28 x 28
         val pixels = IntArray(width * height)
@@ -129,8 +128,6 @@ class DigitsDetector(activity: Activity) {
             val channel = pixel and 0xff
             inputBuffer.putFloat((0xff - channel).toFloat())
         }
-        val endTime = System.currentTimeMillis()
-        Log.d(TAG, "Time cost to put values into ByteBuffer: " + java.lang.Long.toString(endTime - startTime))
     }
 
     companion object {
