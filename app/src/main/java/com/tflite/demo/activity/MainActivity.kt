@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mnistClassifier: DigitsDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

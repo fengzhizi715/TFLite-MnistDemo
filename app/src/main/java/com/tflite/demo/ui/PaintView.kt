@@ -26,10 +26,7 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
     private var currentColor: Int = 0
     private var bgColor = DEFAULT_BG_COLOR
     private var strokeWidth: Int = 0
-    private var emboss: Boolean = false
-    private var blur: Boolean = false
-    private val mEmboss: MaskFilter
-    private val mBlur: MaskFilter
+
     var bitmap: Bitmap? = null
         private set
     private var mCanvas: Canvas? = null
@@ -45,9 +42,6 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
         mPaint.strokeCap = Paint.Cap.ROUND
         mPaint.xfermode = null
         mPaint.alpha = 0xff
-
-        mEmboss = EmbossMaskFilter(floatArrayOf(1f, 1f, 1f), 0.4f, 6f, 3.5f)
-        mBlur = BlurMaskFilter(5f, BlurMaskFilter.Blur.NORMAL)
     }
 
     fun init(metrics: DisplayMetrics) {
@@ -61,25 +55,9 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
         strokeWidth = BRUSH_SIZE
     }
 
-    fun normal() {
-        emboss = false
-        blur = false
-    }
-
-    fun emboss() {
-        emboss = true
-        blur = false
-    }
-
-    fun blur() {
-        emboss = false
-        blur = true
-    }
-
     fun clear() {
         bgColor = DEFAULT_BG_COLOR
         paths.clear()
-        normal()
         invalidate()
     }
 
@@ -88,15 +66,9 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
         canvas.save()
         mCanvas!!.drawColor(bgColor)
 
-        for ((color, emboss1, blur1, strokeWidth1, path) in paths) {
+        for ((color,strokeWidth1, path) in paths) {
             mPaint.color = color
             mPaint.setStrokeWidth(strokeWidth1.toFloat())
-            mPaint.maskFilter = null
-
-            if (emboss1)
-                mPaint.maskFilter = mEmboss
-            else if (blur1)
-                mPaint.maskFilter = mBlur
 
             mCanvas!!.drawPath(path, mPaint)
 
@@ -109,7 +81,7 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
     private fun touchStart(x: Float, y: Float) {
 
         mPath = Path()
-        val fp = FingerPath(currentColor, emboss, blur, strokeWidth, mPath)
+        val fp = FingerPath(currentColor,strokeWidth, mPath)
         paths.add(fp)
 
         mPath.reset()
@@ -160,4 +132,6 @@ class PaintView constructor(context: Context, attrs: AttributeSet? = null) : Vie
         val DEFAULT_BG_COLOR = Color.WHITE
         private val TOUCH_TOLERANCE = 4f
     }
+
+    data class FingerPath(var color: Int, var strokeWidth: Int, var path: Path)
 }
