@@ -43,15 +43,10 @@ class DigitsDetector(activity: Activity) {
             mnistOutput = Array(DIM_BATCH_SIZE) { FloatArray(NUMBER_LENGTH) }
             Log.d(TAG, "Created a Tensorflow Lite MNIST Classifier.")
         } catch (e: IOException) {
-            Log.e(TAG, "IOException loading the tflite file")
+            Log.e(TAG, "IOException loading the tflite file failed.")
         }
 
     }
-
-    /**
-     * Run the TFLite model
-     */
-    private fun runInference() = tflite.run(inputBuffer, mnistOutput)
 
     /**
      * Classifies the number with the mnist model.
@@ -64,40 +59,10 @@ class DigitsDetector(activity: Activity) {
         if (tflite == null) {
             Log.e(TAG, "Image classifier has not been initialized; Skipped.")
         }
+
         preprocess(bitmap)
-        runInference()
+        runModel()
         return postprocess()
-    }
-
-    /**
-     * Go through the output and find the number that was identified.
-     *
-     * @return the number that was identified (returns -1 if one wasn't found)
-     */
-    private fun postprocess(): Int {
-
-        for (i in 0 until mnistOutput[0].size) {
-            val value = mnistOutput[0][i]
-            Log.d(TAG, "Output for " + Integer.toString(i) + ": " + java.lang.Float.toString(value))
-            if (value == 1f) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    /**
-     * Load the model file from the assets folder
-     */
-    @Throws(IOException::class)
-    private fun loadModelFile(activity: Activity): MappedByteBuffer {
-
-        val fileDescriptor = activity.assets.openFd(MODEL_PATH)
-        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
-        val fileChannel = inputStream.channel
-        val startOffset = fileDescriptor.startOffset
-        val declaredLength = fileDescriptor.declaredLength
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
     /**
@@ -130,9 +95,44 @@ class DigitsDetector(activity: Activity) {
         }
     }
 
+    /**
+     * Run the TFLite model
+     */
+    private fun runModel() = tflite.run(inputBuffer, mnistOutput)
+
+    /**
+     * Go through the output and find the number that was identified.
+     *
+     * @return the number that was identified (returns -1 if one wasn't found)
+     */
+    private fun postprocess(): Int {
+
+        for (i in 0 until mnistOutput[0].size) {
+            val value = mnistOutput[0][i]
+            if (value == 1f) {
+                return i
+            }
+        }
+
+        return -1
+    }
+
+    /**
+     * Load the model file from the assets folder
+     */
+    @Throws(IOException::class)
+    private fun loadModelFile(activity: Activity): MappedByteBuffer {
+
+        val fileDescriptor = activity.assets.openFd(MODEL_PATH)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
+
     companion object {
 
-        // Name of the file in the assets folder
         private val MODEL_PATH = "mnist.tflite"
 
         // Specify the output size

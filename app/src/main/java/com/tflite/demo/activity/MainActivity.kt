@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
             if (digit >= 0) {
 
-                Toast.makeText(this, "$digit",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Detect the number is $digit",Toast.LENGTH_SHORT).show()
             } else {
 
                 Toast.makeText(this,"Not detected",Toast.LENGTH_SHORT).show()
